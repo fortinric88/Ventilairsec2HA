@@ -1,0 +1,11 @@
+{
+  "domain": "ventilairsec_enocean",
+  "name": "Ventilairsec Enocean",
+  "version": "0.1.0",
+  "documentation": "https://github.com/fortinric88/Ventilairsec2HA",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": ["@fortinric88"],
+  "config_flow": true,
+  "iot_class": "local_push"
+}
