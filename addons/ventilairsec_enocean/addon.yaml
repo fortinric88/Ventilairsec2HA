@@ -1,29 +1,49 @@
 name: Ventilairsec Enocean
-description: Support pour VMI Purevent Ventilairsec via protocole Enocean
+description: Ventilairsec VMI Purevent integration via Enocean protocol
 version: 1.0.0
 slug: ventilairsec_enocean
 url: https://github.com/fortinric88/Ventilairsec2HA
-documentation: https://github.com/fortinric88/Ventilairsec2HA
+documentation: https://github.com/fortinric88/Ventilairsec2HA/tree/main/addons/ventilairsec_enocean
+source: https://github.com/fortinric88/Ventilairsec2HA
+issues: https://github.com/fortinric88/Ventilairsec2HA/issues
+homeassistant: "2023.10.0"
 codeowners:
   - "@fortinric88"
 startup: services
+boot: auto
+image: ghcr.io/fortinric88/ventilairsec-enocean-{BUILD_ARCH}
 arch:
   - amd64
   - armv7
   - arm64
 
-# Exigences matérielles et logicielles
+# Hardware and software requirements
 requirements:
   - "python >= 3.9"
 
-# Communication USB pour le dongle Enocean
+# USB device access for Enocean dongle
 devices:
   - /dev/ttyUSB0
   - /dev/ttyUSB1
   - /dev/ttyACM0
   - /dev/ttyACM1
 
-# Configuration de l'addon
+# Data persistence
+volumes:
+  logs: /var/log/ventilairsec
+
+# Port mapping
+ports:
+  55006/tcp: 55006
+
+# Network access
+network_mode: host
+
+# System permissions
+privileged:
+  - NET_ADMIN
+
+# Configuration options
 options:
   serial_port: /dev/ttyUSB0
   serial_rate: 115200
@@ -31,11 +51,11 @@ options:
   cycle_time: 0.3
   debug_logging: false
 
-# Schéma de configuration
+# Configuration schema with validation
 schema:
   serial_port:
     type: select
-    description: Port série du dongle Enocean
+    description: Serial port for Enocean dongle
     options:
       - /dev/ttyUSB0
       - /dev/ttyUSB1
@@ -43,52 +63,27 @@ schema:
       - /dev/ttyACM1
       - /dev/ttyAMA0
   serial_rate:
-    type: int
-    description: Vitesse de la communication série (baud)
+    type: integer
+    description: Serial communication speed (baud)
     default: 115200
     validate:
       minimum: 9600
       maximum: 115200
   socket_port:
-    type: int
-    description: Port TCP pour la communication interne
+    type: integer
+    description: TCP port for internal communication
     default: 55006
     validate:
       minimum: 1000
       maximum: 65535
   cycle_time:
     type: float
-    description: Temps de cycle de traitement (secondes)
+    description: Processing cycle time (seconds)
     default: 0.3
     validate:
       minimum: 0.1
       maximum: 1.0
   debug_logging:
-    type: bool
-    description: Activer les logs de débogage détaillés
+    type: boolean
+    description: Enable detailed debug logging
     default: false
-
-# Volume pour la persistance des données
-volumes:
-  logs:
-    mount: /var/log/ventilairsec
-    description: Logs de l'addon
-  config:
-    mount: /etc/ventilairsec
-    description: Fichiers de configuration persistants
-
-# Port d'écoute
-ports:
-  55006/tcp:
-    host: 55006
-    description: Communication Enocean
-
-# Carte réseau
-network_mode: host
-
-# Permissions
-privileged:
-  - net_admin
-
-# Badges
-image: ghcr.io/fortinric88/ventilairsec-enocean:{BUILD_ARCH}

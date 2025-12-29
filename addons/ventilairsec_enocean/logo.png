@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#31BFE0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1C3A45;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" fill="#F5F5F5" />
+  
+  <!-- Large fan visualization -->
+  <g transform="translate(256, 200)">
+    <!-- Fan blades -->
+    <path d="M 0 -80 Q 40 -60 50 0 Q 40 -40 0 -50 Q -40 -40 -50 0 Q -40 -60 0 -80 Z" fill="url(#grad1)" />
+    <path d="M 80 0 Q 60 40 0 50 Q 40 40 50 0 Q 40 -40 0 -50 Q 60 -40 80 0 Z" fill="url(#grad1)" transform="rotate(90)" />
+    <path d="M 0 80 Q 40 60 50 0 Q 40 40 0 50 Q -40 40 -50 0 Q -40 60 0 80 Z" fill="url(#grad1)" transform="rotate(180)" />
+    <path d="M -80 0 Q -60 40 0 50 Q -40 40 -50 0 Q -40 -40 0 -50 Q -60 -40 -80 0 Z" fill="url(#grad1)" transform="rotate(270)" />
+    
+    <!-- Center hub -->
+    <circle cx="0" cy="0" r="25" fill="#1C3A45" />
+    
+    <!-- Sensor indicator -->
+    <circle cx="0" cy="0" r="12" fill="#E84427" />
+  </g>
+  
+  <!-- Label -->
+  <text x="256" y="450" text-anchor="middle" fill="#1C3A45" font-family="Arial, sans-serif" font-weight="bold" font-size="32">Ventilairsec</text>
+  <text x="256" y="485" text-anchor="middle" fill="#666" font-family="Arial, sans-serif" font-size="18">Enocean Integration</text>
+</svg>

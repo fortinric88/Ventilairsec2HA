@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Ventilator symbol -->
+  <defs>
+    <style>
+      .fan-blade { fill: #31BFE0; }
+      .fan-center { fill: #1C3A45; }
+      .sensor { fill: #E84427; }
+    </style>
+  </defs>
+  
+  <!-- Fan blades -->
+  <g class="fan-blade">
+    <!-- Top blade -->
+    <path d="M128 40 Q145 80 140 120 Q135 100 128 90 Q121 100 116 120 Q111 80 128 40 Z" />
+    <!-- Right blade -->
+    <path d="M216 128 Q176 145 136 140 Q156 135 166 128 Q156 121 136 116 Q176 111 216 128 Z" />
+    <!-- Bottom blade -->
+    <path d="M128 216 Q145 176 140 136 Q135 156 128 166 Q121 156 116 136 Q111 176 128 216 Z" />
+    <!-- Left blade -->
+    <path d="M40 128 Q80 145 120 140 Q100 135 90 128 Q100 121 120 116 Q80 111 40 128 Z" />
+  </g>
+  
+  <!-- Center hub -->
+  <circle cx="128" cy="128" r="20" class="fan-center" />
+  
+  <!-- Sensor indicator -->
+  <circle cx="128" cy="128" r="8" class="sensor" />
+  
+  <!-- Enocean wave indicator -->
+  <g stroke="#31BFE0" fill="none" stroke-width="2" opacity="0.6">
+    <circle cx="128" cy="128" r="35" />
+    <circle cx="128" cy="128" r="50" />
+  </g>
+</svg>
