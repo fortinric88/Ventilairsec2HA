@@ -1,7 +1,0 @@
-send_msc:
-  name: "Send MSC frame"
-  description: "Send a raw MSC message to the VMI via the openenocean daemon."
-  fields:
-    message:
-      description: "Hex string or message payload to send"
-      example: "FF00..."

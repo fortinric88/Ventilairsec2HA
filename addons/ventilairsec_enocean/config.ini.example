@@ -1,0 +1,64 @@
+# Fichier de configuration d'exemple pour l'addon
+
+[enocean]
+# Port série du dongle Enocean
+# Exemples:
+# - /dev/ttyUSB0  (Linux/Raspberry Pi USB standard)
+# - /dev/ttyUSB1  (Deuxième port USB)
+# - /dev/ttyACM0  (Port série émulé)
+# - /dev/ttyAMA0  (Raspberry Pi UART GPIO)
+serial_port = /dev/ttyUSB0
+
+# Vitesse de communication (baud)
+# Valeur standard pour Enocean : 115200
+serial_rate = 115200
+
+# Port de socket interne
+# Utilisé pour la communication entre le daemon et le pont HA
+socket_port = 55006
+
+# Temps de cycle de traitement (secondes)
+# - Valeur basse = réactivité meilleure mais CPU plus élevé
+# - Valeur haute = CPU bas mais latence plus élevée
+# Recommandé: 0.2-0.5 selon le système
+cycle_time = 0.3
+
+# Activer les logs détaillés
+# true = tous les paquets et détails
+# false = logs normaux (défaut)
+debug_logging = false
+
+[homeassistant]
+# Hôte Home Assistant
+# "supervisor" = intégration superviseur (addons)
+# "localhost" = connexion locale
+# "192.168.1.100" = IP du serveur HA
+host = supervisor
+
+# Port Home Assistant
+port = 8123
+
+# Token API (obtenu automatiquement via superviseur)
+# Lasssé vide si utilisant "supervisor"
+token = 
+
+[logging]
+# Niveau de log
+# DEBUG : Très verbeux
+# INFO : Informations normales
+# WARNING : Seulement avertissements
+# ERROR : Seulement erreurs
+level = INFO
+
+# Format des logs
+format = %(asctime)s - %(name)s - %(levelname)s - %(message)s
+
+[persistence]
+# Dossier de sauvegarde des données
+config_path = /var/lib/ventilairsec
+
+# Sauvegarder les appareils découverts
+save_devices = true
+
+# Interval de sauvegarde (secondes)
+save_interval = 300

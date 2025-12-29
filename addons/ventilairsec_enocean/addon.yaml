@@ -1,0 +1,94 @@
+name: Ventilairsec Enocean
+description: Support pour VMI Purevent Ventilairsec via protocole Enocean
+version: 1.0.0
+slug: ventilairsec_enocean
+url: https://github.com/fortinric88/Ventilairsec2HA
+documentation: https://github.com/fortinric88/Ventilairsec2HA
+codeowners:
+  - "@fortinric88"
+startup: services
+arch:
+  - amd64
+  - armv7
+  - arm64
+
+# Exigences matérielles et logicielles
+requirements:
+  - "python >= 3.9"
+
+# Communication USB pour le dongle Enocean
+devices:
+  - /dev/ttyUSB0
+  - /dev/ttyUSB1
+  - /dev/ttyACM0
+  - /dev/ttyACM1
+
+# Configuration de l'addon
+options:
+  serial_port: /dev/ttyUSB0
+  serial_rate: 115200
+  socket_port: 55006
+  cycle_time: 0.3
+  debug_logging: false
+
+# Schéma de configuration
+schema:
+  serial_port:
+    type: select
+    description: Port série du dongle Enocean
+    options:
+      - /dev/ttyUSB0
+      - /dev/ttyUSB1
+      - /dev/ttyACM0
+      - /dev/ttyACM1
+      - /dev/ttyAMA0
+  serial_rate:
+    type: int
+    description: Vitesse de la communication série (baud)
+    default: 115200
+    validate:
+      minimum: 9600
+      maximum: 115200
+  socket_port:
+    type: int
+    description: Port TCP pour la communication interne
+    default: 55006
+    validate:
+      minimum: 1000
+      maximum: 65535
+  cycle_time:
+    type: float
+    description: Temps de cycle de traitement (secondes)
+    default: 0.3
+    validate:
+      minimum: 0.1
+      maximum: 1.0
+  debug_logging:
+    type: bool
+    description: Activer les logs de débogage détaillés
+    default: false
+
+# Volume pour la persistance des données
+volumes:
+  logs:
+    mount: /var/log/ventilairsec
+    description: Logs de l'addon
+  config:
+    mount: /etc/ventilairsec
+    description: Fichiers de configuration persistants
+
+# Port d'écoute
+ports:
+  55006/tcp:
+    host: 55006
+    description: Communication Enocean
+
+# Carte réseau
+network_mode: host
+
+# Permissions
+privileged:
+  - net_admin
+
+# Badges
+image: ghcr.io/fortinric88/ventilairsec-enocean:{BUILD_ARCH}

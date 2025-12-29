@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  ventilairsec_enocean:
+    build:
+      context: ./addons/ventilairsec_enocean
+      dockerfile: Dockerfile
+    container_name: ventilairsec_enocean
+    restart: unless-stopped
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0:rw  # Adapter selon votre port
+    ports:
+      - "55006:55006"
+    volumes:
+      - ./config:/etc/ventilairsec
+      - ./logs:/var/log/ventilairsec
+      - ./data:/var/lib/ventilairsec
+    environment:
+      - SERIAL_PORT=/dev/ttyUSB0
+      - SERIAL_RATE=115200
+      - SOCKET_PORT=55006
+      - CYCLE_TIME=0.3
+      - DEBUG_LOGGING=false
+    networks:
+      - home-assistant
+
+networks:
+  home-assistant:
+    driver: bridge
+
+volumes:
+  config:
+  logs:
+  data:

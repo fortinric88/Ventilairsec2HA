@@ -1,0 +1,50 @@
+{
+  "name": "Ventilairsec Home Assistant Addons",
+  "url": "https://github.com/fortinric88/Ventilairsec2HA",
+  "maintainer": "fortinric88 <your-email@example.com>",
+  "codeowners": [
+    "@fortinric88"
+  ],
+  "addons": [
+    {
+      "name": "Ventilairsec Enocean",
+      "slug": "ventilairsec_enocean",
+      "description": "Support pour VMI Purevent Ventilairsec via protocole Enocean",
+      "arch": [
+        "amd64",
+        "armv7",
+        "arm64"
+      ],
+      "url": "https://github.com/fortinric88/Ventilairsec2HA/tree/main/addons/ventilairsec_enocean",
+      "version": "1.0.0",
+      "image": "ghcr.io/fortinric88/ventilairsec-enocean-{arch}",
+      "startup": "services",
+      "boot": "auto",
+      "privileged": [
+        "NET_ADMIN"
+      ],
+      "ports": {
+        "55006/tcp": 55006
+      },
+      "map": [
+        "config:rw",
+        "ssl:ro",
+        "logs:rw"
+      ],
+      "options": {
+        "serial_port": "/dev/ttyUSB0",
+        "serial_rate": 115200,
+        "socket_port": 55006,
+        "cycle_time": 0.3,
+        "debug_logging": false
+      },
+      "schema": {
+        "serial_port": "str",
+        "serial_rate": "int",
+        "socket_port": "int",
+        "cycle_time": "float",
+        "debug_logging": "bool"
+      }
+    }
+  ]
+}
