@@ -1,17 +1,21 @@
-ARG BUILD_FROM
-FROM $BUILD_FROM
+ARG BUILD_FROM=homeassistant/amd64-base:latest
+FROM ${BUILD_FROM}
 
 # Installer les dépendances système
-RUN apk add --no-cache \
-    python3 \
-    py3-pip \
-    py3-requests \
-    py3-serial \
-    py3-cryptography \
-    git \
-    gcc \
-    musl-dev \
-    python3-dev
+RUN if [ "$(uname -m)" = "aarch64" ]; then \
+      apk add --no-cache python3 py3-pip; \
+    else \
+      apk add --no-cache \
+        python3 \
+        py3-pip \
+        py3-requests \
+        py3-serial \
+        py3-cryptography \
+        git \
+        gcc \
+        musl-dev \
+        python3-dev; \
+    fi
 
 # Définir le répertoire de travail
 WORKDIR /app

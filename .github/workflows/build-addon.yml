@@ -15,16 +15,19 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.addon }}
+    name: Build ${{ matrix.addon }} - ${{ matrix.arch }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         addon:
           - ventilairsec_enocean
-        arch:
-          - amd64
-          - armv7
-          - arm64
+        include:
+          - arch: amd64
+            build_from: homeassistant/amd64-base:latest
+          - arch: armv7
+            build_from: homeassistant/armv7-base:latest
+          - arch: arm64
+            build_from: homeassistant/aarch64-base:latest
 
     steps:
       - name: Checkout repository
@@ -46,6 +49,8 @@ jobs:
           context: ./addons/${{ matrix.addon }}
           file: ./addons/${{ matrix.addon }}/Dockerfile
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          build-args: |
+            BUILD_FROM=${{ matrix.build_from }}
           platforms: linux/${{ matrix.arch }}
           tags: |
             ghcr.io/${{ github.repository_owner }}/ventilairsec-enocean-${{ matrix.arch }}:${{ github.sha }}
