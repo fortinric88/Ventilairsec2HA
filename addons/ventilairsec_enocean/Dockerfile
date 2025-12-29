@@ -4,10 +4,7 @@ FROM ${BUILD_FROM}
 # Installer les dépendances système
 RUN apk add --no-cache \
       python3 \
-      py3-pip \
-      py3-requests \
-      py3-serial \
-      py3-cryptography
+      py3-pip
 
 # Définir le répertoire de travail
 WORKDIR /app
