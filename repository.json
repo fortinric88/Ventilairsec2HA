@@ -32,21 +32,33 @@
         "/dev/ttyUSB0",
         "/dev/ttyUSB1",
         "/dev/ttyACM0",
-        "/dev/ttyACM1"
+        "/dev/ttyACM1",
+        "/dev/mem",
+        "/dev/gpiomem"
       ],
       "volumes": {
         "logs": "/var/log/ventilairsec"
       },
       "options": {
+        "communication_type": "serial",
         "serial_port": "/dev/ttyUSB0",
         "serial_rate": 115200,
+        "gpio_mode": "spi",
+        "gpio_tx_pin": 24,
+        "gpio_rx_pin": 25,
+        "gpio_reset_pin": 17,
         "socket_port": 55006,
         "cycle_time": 0.3,
         "debug_logging": false
       },
       "schema": {
+        "communication_type": "select",
         "serial_port": "select",
         "serial_rate": "integer",
+        "gpio_mode": "select",
+        "gpio_tx_pin": "integer",
+        "gpio_rx_pin": "integer",
+        "gpio_reset_pin": "integer",
         "socket_port": "integer",
         "cycle_time": "float",
         "debug_logging": "boolean"

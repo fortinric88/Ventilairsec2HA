@@ -1,5 +1,5 @@
 """
-Daemon Enocean - Gère la communication via le port série avec les appareils Enocean
+Daemon Enocean - Gère la communication via port série ou GPIO avec les appareils Enocean
 """
 
 import logging
@@ -13,7 +13,7 @@ from queue import Queue
 logger = logging.getLogger('ventilairsec_enocean.daemon')
 
 class EnoceanDaemon:
-    """Daemon pour gérer la communication Enocean"""
+    """Daemon pour gérer la communication Enocean (série ou GPIO)"""
     
     # Constantes Enocean
     ENOCEAN_HEADER = 0x55
@@ -35,20 +35,38 @@ class EnoceanDaemon:
         
         Args:
             config: Dictionnaire de configuration contenant:
-                - serial_port: Port série (ex: /dev/ttyUSB0)
-                - serial_rate: Vitesse (ex: 115200)
+                - communication_type: "serial" ou "gpio"
+                - serial_port: Port série (ex: /dev/ttyUSB0) si serial
+                - serial_rate: Vitesse (ex: 115200) si serial
+                - gpio_mode: "spi", "uart", ou "i2c" si gpio
+                - gpio_tx_pin: Pin GPIO TX si uart/gpio
+                - gpio_rx_pin: Pin GPIO RX si uart/gpio
                 - socket_port: Port de socket interne
                 - cycle_time: Temps de cycle de traitement
                 - debug_logging: Activer les logs détaillés
         """
         self.config = config
         self.serial = None
+        self.gpio_bridge = None
+        self.communication_type = config.get('communication_type', 'serial')
         self.running = False
         self.receive_queue = Queue()
         self.send_queue = Queue()
         self.listeners = []
         
     async def initialize(self):
+        """Initialiser la connexion (série ou GPIO)"""
+        try:
+            if self.communication_type == 'gpio':
+                await self._initialize_gpio()
+            else:
+                await self._initialize_serial()
+                
+        except Exception as e:
+            logger.error(f"Erreur lors de l'initialisation: {e}")
+            raise
+    
+    async def _initialize_serial(self):
         """Initialiser la connexion série"""
         try:
             port = self.config.get('serial_port', '/dev/ttyUSB0')
@@ -77,6 +95,25 @@ class EnoceanDaemon:
             logger.error(f"Erreur lors de l'initialisation du port série: {e}")
             raise
     
+    async def _initialize_gpio(self):
+        """Initialiser la connexion GPIO (EnOcean Pi)"""
+        try:
+            from enocean_gpio import EnoceanGPIOBridge
+            
+            logger.info("Initialisation du bridge GPIO Enocean...")
+            
+            self.gpio_bridge = EnoceanGPIOBridge(self.config)
+            await self.gpio_bridge.initialize()
+            
+            logger.info(f"GPIO Enocean initialized (mode={self.config.get('gpio_mode', 'spi')})")
+            
+        except ImportError as e:
+            logger.error(f"Module GPIO manquant: {e}")
+            raise RuntimeError("GPIO support requires gpiozero or RPi.GPIO")
+        except Exception as e:
+            logger.error(f"Erreur lors de l'initialisation GPIO: {e}")
+            raise
+    
     def run(self):
         """Lancer le daemon de lecture/écriture"""
         self.running = True
@@ -91,6 +128,13 @@ class EnoceanDaemon:
                 logger.error(f"Erreur dans le daemon: {e}")
     
     def _process_receive(self):
+        """Traiter les données reçues (série ou GPIO)"""
+        if self.communication_type == 'gpio':
+            self._process_receive_gpio()
+        else:
+            self._process_receive_serial()
+    
+    def _process_receive_serial(self):
         """Traiter les données reçues du port série"""
         if not self.serial or not self.serial.is_open:
             return
@@ -103,7 +147,20 @@ class EnoceanDaemon:
                     if packet:
                         self._handle_packet(packet)
             except Exception as e:
-                logger.error(f"Erreur lors de la réception: {e}")
+                logger.error(f"Erreur lors de la réception série: {e}")
+    
+    def _process_receive_gpio(self):
+        """Traiter les données reçues via GPIO"""
+        if not self.gpio_bridge:
+            return
+        
+        try:
+            import asyncio
+            packet = asyncio.run(self.gpio_bridge.read_packet())
+            if packet:
+                self._handle_packet(packet)
+        except Exception as e:
+            logger.error(f"Erreur lors de la réception GPIO: {e}")
     
     def _read_packet(self) -> Optional[Dict[str, Any]]:
         """Lire un paquet Enocean complet"""
@@ -299,6 +356,12 @@ class EnoceanDaemon:
     def stop(self):
         """Arrêter le daemon"""
         self.running = False
-        if self.serial and self.serial.is_open:
-            self.serial.close()
+        
+        if self.communication_type == 'gpio':
+            if self.gpio_bridge:
+                self.gpio_bridge.shutdown()
+        else:
+            if self.serial and self.serial.is_open:
+                self.serial.close()
+        
         logger.info("Daemon Enocean arrêté")

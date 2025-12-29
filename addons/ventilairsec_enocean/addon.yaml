@@ -27,6 +27,8 @@ devices:
   - /dev/ttyUSB1
   - /dev/ttyACM0
   - /dev/ttyACM1
+  - /dev/mem      # For GPIO access
+  - /dev/gpiomem  # For GPIO access without root
 
 # Data persistence
 volumes:
@@ -45,17 +47,29 @@ privileged:
 
 # Configuration options
 options:
+  communication_type: serial
   serial_port: /dev/ttyUSB0
   serial_rate: 115200
+  gpio_mode: spi
+  gpio_tx_pin: 24
+  gpio_rx_pin: 25
+  gpio_reset_pin: 17
   socket_port: 55006
   cycle_time: 0.3
   debug_logging: false
 
 # Configuration schema with validation
 schema:
+  communication_type:
+    type: select
+    description: Communication method
+    options:
+      - serial
+      - gpio
+    default: serial
   serial_port:
     type: select
-    description: Serial port for Enocean dongle
+    description: Serial port for Enocean dongle (if using serial mode)
     options:
       - /dev/ttyUSB0
       - /dev/ttyUSB1
@@ -69,6 +83,35 @@ schema:
     validate:
       minimum: 9600
       maximum: 115200
+  gpio_mode:
+    type: select
+    description: GPIO communication mode (if using GPIO)
+    options:
+      - spi
+      - uart
+      - i2c
+    default: spi
+  gpio_tx_pin:
+    type: integer
+    description: GPIO pin for TX (UART mode) or CS (SPI mode)
+    default: 24
+    validate:
+      minimum: 0
+      maximum: 28
+  gpio_rx_pin:
+    type: integer
+    description: GPIO pin for RX (UART mode only)
+    default: 25
+    validate:
+      minimum: 0
+      maximum: 28
+  gpio_reset_pin:
+    type: integer
+    description: GPIO pin for RESET (optional, 0 to disable)
+    default: 17
+    validate:
+      minimum: 0
+      maximum: 28
   socket_port:
     type: integer
     description: TCP port for internal communication

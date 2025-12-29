@@ -1,3 +1,5 @@
 pyserial==3.5
 requests==2.31.0
-cryptography==41.0.7
+cryptography==41.0.7gpiozero==2.0.1
+RPi.GPIO==0.7.0
+adafruit-blinka==8.2.0
