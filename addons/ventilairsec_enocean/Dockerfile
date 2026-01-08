@@ -5,8 +5,8 @@ FROM ${BUILD_FROM}
 RUN apk add --no-cache \
       python3 \
       py3-pip \
-      py3-serial \
-      bash
+      bash \
+      git
 
 # Set working directory
 WORKDIR /app
@@ -27,6 +27,10 @@ RUN chmod a+x /run.sh
 RUN mkdir -p /var/log/ventilairsec \
              /var/lib/ventilairsec \
              /etc/ventilairsec
+
+# Set entry point
+ENTRYPOINT ["/run.sh"]
+
 
 # Set entry point
 ENTRYPOINT ["/run.sh"]
