@@ -1,8 +1,6 @@
 pyserial==3.5
+paho-mqtt==1.6.1
 requests==2.31.0
 cryptography==41.0.7
-
-# GPIO support is optional - install these only if using GPIO mode:
-# gpiozero==2.0.1
-# RPi.GPIO==0.7.0  
-# adafruit-blinka==8.2.0
+pyyaml==6.0.1
+tinydb==4.7.1

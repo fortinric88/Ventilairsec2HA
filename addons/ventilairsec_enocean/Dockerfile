@@ -1,25 +1,32 @@
 ARG BUILD_FROM=homeassistant/amd64-base:latest
 FROM ${BUILD_FROM}
 
-# Installer les dépendances système
+# Install system dependencies
 RUN apk add --no-cache \
       python3 \
-      py3-pip
+      py3-pip \
+      py3-serial \
+      bash
 
-# Définir le répertoire de travail
+# Set working directory
 WORKDIR /app
 
-# Copier les requirements
+# Copy requirements
 COPY requirements.txt .
 
-# Installer les dépendances Python
+# Install Python dependencies
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Copier les fichiers de l'application
+# Copy application files
 COPY rootfs /
 
-# Permissions sur le script de démarrage
+# Fix permissions for startup script
 RUN chmod a+x /run.sh
 
-# Définir le point d'entrée
+# Create required directories
+RUN mkdir -p /var/log/ventilairsec \
+             /var/lib/ventilairsec \
+             /etc/ventilairsec
+
+# Set entry point
 ENTRYPOINT ["/run.sh"]

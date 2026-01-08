@@ -1,53 +1,72 @@
 #!/bin/bash
-# Script de validation de l'addon pour Home Assistant
-# Certifie que l'addon respecte les standards HA
+# Addon validation script for Home Assistant
+# Ensures the addon follows HA standards and can appear in store
 
 set -e
 
-echo "=== Validation de l'addon Ventilairsec Enocean ==="
+echo "=== Validating Ventilairsec Enocean Addon ==="
 echo ""
 
-# Vérifier les fichiers obligatoires
-echo "✓ Vérification des fichiers obligatoires..."
+# Check required files
+echo "✓ Checking required files..."
 required_files=(
     "addon.yaml"
     "Dockerfile"
     "README.md"
     "requirements.txt"
+    "rootfs/run.sh"
 )
 
 for file in "${required_files[@]}"; do
     if [ -f "$file" ]; then
         echo "  ✅ $file"
     else
-        echo "  ❌ MANQUANT: $file"
+        echo "  ❌ MISSING: $file"
         exit 1
     fi
 done
 
 echo ""
-echo "✓ Vérification de addon.yaml..."
-# Vérifier que addon.yaml est valide YAML
+echo "✓ Validating addon.yaml..."
+# Check if addon.yaml is valid YAML
 if python3 -c "import yaml; yaml.safe_load(open('addon.yaml'))" 2>/dev/null; then
-    echo "  ✅ addon.yaml valide"
+    echo "  ✅ addon.yaml is valid YAML"
 else
-    echo "  ❌ addon.yaml invalide"
+    echo "  ❌ addon.yaml is invalid YAML"
     exit 1
 fi
 
 echo ""
-echo "✓ Vérification du Dockerfile..."
-if grep -q "FROM" Dockerfile && grep -q "ENTRYPOINT" Dockerfile; then
-    echo "  ✅ Dockerfile valide"
+echo "✓ Validating Dockerfile..."
+if grep -q "FROM" Dockerfile && grep -q "ENTRYPOINT\|CMD" Dockerfile; then
+    echo "  ✅ Dockerfile is valid"
 else
-    echo "  ❌ Dockerfile manque FROM ou ENTRYPOINT"
+    echo "  ❌ Dockerfile missing FROM or ENTRYPOINT/CMD"
     exit 1
 fi
 
 echo ""
-echo "✓ Vérification des requirements..."
-if python3 -c "import ast; ast.parse(open('requirements.txt').read())" 2>/dev/null || true; then
-    echo "  ✅ requirements.txt valide"
+echo "✓ Checking addon structure..."
+if [ -d "rootfs/app" ]; then
+    echo "  ✅ Application directory exists"
+else
+    echo "  ❌ Missing rootfs/app directory"
+    exit 1
+fi
+
+echo ""
+echo "✓ Checking configuration schema..."
+# Validate that schema has required fields
+if grep -q "serial_port" addon.yaml && grep -q "mqtt_broker" addon.yaml; then
+    echo "  ✅ Configuration schema has required fields"
+else
+    echo "  ❌ Missing required configuration fields"
+    exit 1
+fi
+
+echo ""
+echo "✅ All validations passed! Addon should appear in Home Assistant store."
+
 fi
 
 echo ""

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-# Coleurs pour les logs
+# Colors for logging
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -9,49 +9,57 @@ NC='\033[0m'
 
 source /usr/lib/bashio/bashio.sh
 
-echo -e "${GREEN}=== Initialisation de l'addon Ventilairsec Enocean ===${NC}"
+bashio::log.info "Starting Ventilairsec Enocean addon..."
 
-# Obtenir les paramètres de configuration
+# Get configuration from Home Assistant
 SERIAL_PORT=$(bashio::config 'serial_port')
 SERIAL_RATE=$(bashio::config 'serial_rate')
-SOCKET_PORT=$(bashio::config 'socket_port')
-CYCLE_TIME=$(bashio::config 'cycle_time')
 DEBUG_LOGGING=$(bashio::config 'debug_logging')
+MQTT_BROKER=$(bashio::config 'mqtt_broker')
+MQTT_PORT=$(bashio::config 'mqtt_port')
+MQTT_USER=$(bashio::config 'mqtt_user')
+MQTT_PASSWORD=$(bashio::config 'mqtt_password')
 
-bashio::log.info "Configuration chargée:"
-bashio::log.info "  Port série: $SERIAL_PORT"
-bashio::log.info "  Vitesse: $SERIAL_RATE baud"
-bashio::log.info "  Port socket: $SOCKET_PORT"
-bashio::log.info "  Cycle: $CYCLE_TIME s"
-bashio::log.info "  Debug: $DEBUG_LOGGING"
+bashio::log.info "Configuration loaded:"
+bashio::log.info "  Serial port: $SERIAL_PORT"
+bashio::log.info "  Serial rate: $SERIAL_RATE baud"
+bashio::log.info "  MQTT broker: $MQTT_BROKER:$MQTT_PORT"
+bashio::log.info "  Debug mode: $DEBUG_LOGGING"
 
-# Créer les répertoires nécessaires
+# Create required directories
 mkdir -p /var/log/ventilairsec
-mkdir -p /etc/ventilairsec
 mkdir -p /var/lib/ventilairsec
+mkdir -p /etc/ventilairsec
 
-# Créer le fichier de configuration Python
-cat > /etc/ventilairsec/config.ini << EOF
-[enocean]
+# Create configuration file for enoceanmqtt
+cat > /etc/ventilairsec/enoceanmqtt.conf << EOF
+[global]
+mqtt_broker = $MQTT_BROKER
+mqtt_port = $MQTT_PORT
+mqtt_user = $MQTT_USER
+mqtt_password = $MQTT_PASSWORD
 serial_port = $SERIAL_PORT
 serial_rate = $SERIAL_RATE
-socket_port = $SOCKET_PORT
-cycle_time = $CYCLE_TIME
-debug_logging = $DEBUG_LOGGING
+debug = $DEBUG_LOGGING
+overlay = ha
+db_file = /var/lib/ventilairsec/device_db.json
+ha_discovery_prefix = homeassistant
 
-[homeassistant]
-host = supervisor
-port = 8123
-token = \${SUPERVISOR_TOKEN}
 EOF
 
-bashio::log.info "Configuration sauvegardée dans /etc/ventilairsec/config.ini"
+bashio::log.info "Configuration file created at /etc/ventilairsec/enoceanmqtt.conf"
 
-# Vérifier la disponibilité du port série
+# Check serial port availability
 if [ ! -c "$SERIAL_PORT" ]; then
-    bashio::log.error "Port série $SERIAL_PORT non disponible"
-    bashio::log.warning "Attendez quelques secondes et réessayez..."
-    # Ne pas sortir ici, le daemon tentera de se reconnecter
+    bashio::log.warning "Serial port $SERIAL_PORT not available"
+    bashio::log.warning "Waiting for device to be available..."
+    sleep 5
 fi
 
-bashio::log.info "Port série détecté: $SERIAL_PORT"
+bashio::log.info "Serial port detected: $SERIAL_PORT"
+bashio::log.info "Starting Enocean daemon..."
+
+# Start the main application
+cd /app
+python3 enoceanmqtt.py --config /etc/ventilairsec/enoceanmqtt.conf $([ "$DEBUG_LOGGING" = "true" ] && echo "--debug")
+

@@ -22,47 +22,72 @@
       "boot": "auto",
       "homeassistant": "2023.10.0",
       "network_mode": "host",
-      "privileged": [
-        "NET_ADMIN"
-      ],
-      "ports": {
-        "55006/tcp": 55006
-      },
       "devices": [
         "/dev/ttyUSB0",
         "/dev/ttyUSB1",
         "/dev/ttyACM0",
-        "/dev/ttyACM1",
-        "/dev/mem",
-        "/dev/gpiomem"
+        "/dev/ttyACM1"
       ],
       "volumes": {
         "logs": "/var/log/ventilairsec"
       },
       "options": {
-        "communication_type": "serial",
         "serial_port": "/dev/ttyUSB0",
-        "serial_rate": 115200,
-        "gpio_mode": "spi",
-        "gpio_tx_pin": 24,
-        "gpio_rx_pin": 25,
-        "gpio_reset_pin": 17,
-        "socket_port": 55006,
-        "cycle_time": 0.3,
+        "serial_rate": 57600,
+        "mqtt_broker": "localhost",
+        "mqtt_port": 1883,
+        "mqtt_user": "",
+        "mqtt_password": "",
         "debug_logging": false
       },
       "schema": {
-        "communication_type": "select",
-        "serial_port": "select",
-        "serial_rate": "integer",
-        "gpio_mode": "select",
-        "gpio_tx_pin": "integer",
-        "gpio_rx_pin": "integer",
-        "gpio_reset_pin": "integer",
-        "socket_port": "integer",
-        "cycle_time": "float",
-        "debug_logging": "boolean"
+        "serial_port": {
+          "type": "select",
+          "description": "Serial port for Enocean dongle",
+          "required": true,
+          "options": [
+            "/dev/ttyUSB0",
+            "/dev/ttyUSB1",
+            "/dev/ttyACM0",
+            "/dev/ttyACM1",
+            "/dev/ttyAMA0"
+          ]
+        },
+        "serial_rate": {
+          "type": "integer",
+          "description": "Serial communication speed (baud)",
+          "default": 57600,
+          "required": true
+        },
+        "mqtt_broker": {
+          "type": "string",
+          "description": "MQTT broker hostname or IP address",
+          "default": "localhost",
+          "required": true
+        },
+        "mqtt_port": {
+          "type": "integer",
+          "description": "MQTT broker port",
+          "default": 1883,
+          "required": true
+        },
+        "mqtt_user": {
+          "type": "string",
+          "description": "MQTT username",
+          "required": false
+        },
+        "mqtt_password": {
+          "type": "string",
+          "description": "MQTT password",
+          "required": false
+        },
+        "debug_logging": {
+          "type": "boolean",
+          "description": "Enable debug logging",
+          "default": false
+        }
       }
     }
   ]
 }
+

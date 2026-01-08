@@ -1,0 +1,26 @@
+# Ventilairsec Enocean Configuration File
+# Example configuration for Home Assistant addon
+
+[global]
+# MQTT Configuration
+mqtt_broker = localhost
+mqtt_port = 1883
+mqtt_user = 
+mqtt_password = 
+serial_port = /dev/ttyUSB0
+serial_rate = 57600
+debug = false
+overlay = ha
+db_file = /var/lib/ventilairsec/device_db.json
+ha_discovery_prefix = homeassistant
+
+# Sensor configurations (optional examples)
+# Uncomment and modify as needed
+
+# [sensor:living_room_ventilation]
+# address = 0xAABBCCDD
+# rorg = 0xA5
+# func = 0x10
+# type = 0x03
+# name = Living Room Ventilation
+# unit = %

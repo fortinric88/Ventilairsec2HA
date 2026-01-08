@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
+# Install bashio library for Home Assistant addon support
 
 set -e
 
-# Installer bashio
 if [ ! -f /usr/lib/bashio/bashio.sh ]; then
-    echo "Installation de bashio..."
+    echo "Installing bashio library..."
     mkdir -p /tmp
     cd /tmp
     wget -q https://github.com/hassio-addons/bashio/archive/master.tar.gz
@@ -14,4 +14,5 @@ if [ ! -f /usr/lib/bashio/bashio.sh ]; then
     rm -rf /tmp/bashio* /tmp/master.tar.gz
 fi
 
-echo "Installation complète"
+echo "Bashio installation complete"
+

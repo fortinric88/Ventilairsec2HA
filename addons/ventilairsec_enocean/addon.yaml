@@ -19,7 +19,7 @@ arch:
 
 # Hardware and software requirements
 requirements:
-  - "python >= 3.9"
+  - python >= 3.9
 
 # USB device access for Enocean dongle
 devices:
@@ -27,49 +27,30 @@ devices:
   - /dev/ttyUSB1
   - /dev/ttyACM0
   - /dev/ttyACM1
-  - /dev/mem      # For GPIO access
-  - /dev/gpiomem  # For GPIO access without root
 
 # Data persistence
 volumes:
   logs: /var/log/ventilairsec
 
-# Port mapping
-ports:
-  55006/tcp: 55006
-
 # Network access
 network_mode: host
 
-# System permissions
-privileged:
-  - NET_ADMIN
-
-# Configuration options
+# Configuration options with defaults
 options:
-  communication_type: serial
   serial_port: /dev/ttyUSB0
-  serial_rate: 115200
-  gpio_mode: spi
-  gpio_tx_pin: 24
-  gpio_rx_pin: 25
-  gpio_reset_pin: 17
-  socket_port: 55006
-  cycle_time: 0.3
+  serial_rate: 57600
+  mqtt_broker: localhost
+  mqtt_port: 1883
+  mqtt_user: ""
+  mqtt_password: ""
   debug_logging: false
 
 # Configuration schema with validation
 schema:
-  communication_type:
-    type: select
-    description: Communication method
-    options:
-      - serial
-      - gpio
-    default: serial
   serial_port:
     type: select
-    description: Serial port for Enocean dongle (if using serial mode)
+    description: Serial port for Enocean dongle
+    required: true
     options:
       - /dev/ttyUSB0
       - /dev/ttyUSB1
@@ -79,54 +60,34 @@ schema:
   serial_rate:
     type: integer
     description: Serial communication speed (baud)
-    default: 115200
+    default: 57600
+    required: true
     validate:
       minimum: 9600
       maximum: 115200
-  gpio_mode:
-    type: select
-    description: GPIO communication mode (if using GPIO)
-    options:
-      - spi
-      - uart
-      - i2c
-    default: spi
-  gpio_tx_pin:
+  mqtt_broker:
+    type: string
+    description: MQTT broker hostname or IP address
+    default: localhost
+    required: true
+  mqtt_port:
     type: integer
-    description: GPIO pin for TX (UART mode) or CS (SPI mode)
-    default: 24
+    description: MQTT broker port
+    default: 1883
+    required: true
     validate:
-      minimum: 0
-      maximum: 28
-  gpio_rx_pin:
-    type: integer
-    description: GPIO pin for RX (UART mode only)
-    default: 25
-    validate:
-      minimum: 0
-      maximum: 28
-  gpio_reset_pin:
-    type: integer
-    description: GPIO pin for RESET (optional, 0 to disable)
-    default: 17
-    validate:
-      minimum: 0
-      maximum: 28
-  socket_port:
-    type: integer
-    description: TCP port for internal communication
-    default: 55006
-    validate:
-      minimum: 1000
+      minimum: 1
       maximum: 65535
-  cycle_time:
-    type: float
-    description: Processing cycle time (seconds)
-    default: 0.3
-    validate:
-      minimum: 0.1
-      maximum: 1.0
+  mqtt_user:
+    type: string
+    description: MQTT username (leave empty if not required)
+    required: false
+  mqtt_password:
+    type: string
+    description: MQTT password (leave empty if not required)
+    required: false
   debug_logging:
     type: boolean
-    description: Enable detailed debug logging
+    description: Enable detailed debug logging for troubleshooting
     default: false
+

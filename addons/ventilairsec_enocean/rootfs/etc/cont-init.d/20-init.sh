@@ -1,9 +1,17 @@
 #!/bin/sh
+# Initialize required directories and files
+
 set -e
 
-CONFIG_PATH=/etc/ventilairsec/config.ini
-
-# Créer le répertoire s'il n'existe pas
+# Create required directories
+mkdir -p /var/log/ventilairsec
+mkdir -p /var/lib/ventilairsec
 mkdir -p /etc/ventilairsec
 
-# Les variables seront définies dans run.sh
+# Create example config if not exists
+if [ ! -f /etc/ventilairsec/enoceanmqtt.conf ]; then
+    cp /etc/enoceanmqtt.conf.sample /etc/ventilairsec/enoceanmqtt.conf
+fi
+
+echo "Directories and configuration initialized"
+
