@@ -43,6 +43,7 @@ options:
   mqtt_port: 1883
   mqtt_user: ""
   mqtt_password: ""
+  mqtt_use_tls: false
   debug_logging: false
 
 # Configuration schema with validation
@@ -72,7 +73,7 @@ schema:
     required: true
   mqtt_port:
     type: integer
-    description: MQTT broker port
+    description: MQTT broker port (1883 for plain, 8883 for TLS)
     default: 1883
     required: true
     validate:
@@ -84,8 +85,12 @@ schema:
     required: false
   mqtt_password:
     type: string
-    description: MQTT password (leave empty if not required)
+    description: MQTT password (leave empty if not required). Stored securely by Home Assistant.
     required: false
+  mqtt_use_tls:
+    type: boolean
+    description: Use TLS/SSL encryption for MQTT connection (recommended for security)
+    default: false
   debug_logging:
     type: boolean
     description: Enable detailed debug logging for troubleshooting

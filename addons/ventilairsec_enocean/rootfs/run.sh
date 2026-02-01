@@ -32,6 +32,7 @@ mkdir -p /var/lib/ventilairsec
 mkdir -p /etc/ventilairsec
 
 # Create configuration file for enoceanmqtt
+# Use restrictive permissions (0600) for security - only root can read/write
 cat > /etc/ventilairsec/enoceanmqtt.conf << EOF
 [global]
 mqtt_broker = $MQTT_BROKER
@@ -47,16 +48,33 @@ ha_discovery_prefix = homeassistant
 
 EOF
 
-bashio::log.info "Configuration file created at /etc/ventilairsec/enoceanmqtt.conf"
+# Set restrictive permissions on config file containing credentials
+chmod 0600 /etc/ventilairsec/enoceanmqtt.conf
 
-# Check serial port availability
+bashio::log.info "Configuration file created at /etc/ventilairsec/enoceanmqtt.conf (permissions: 0600)"
+
+# Check serial port availability with timeout
+bashio::log.info "Checking for serial port: $SERIAL_PORT"
+TIMEOUT=30
+ELAPSED=0
+
+while [ $ELAPSED -lt $TIMEOUT ]; do
+    if [ -c "$SERIAL_PORT" ]; then
+        bashio::log.info "Serial port detected: $SERIAL_PORT"
+        break
+    fi
+    
+    bashio::log.warning "Serial port $SERIAL_PORT not available (waiting: ${ELAPSED}s/$TIMEOUT)"
+    sleep 2
+    ELAPSED=$((ELAPSED + 2))
+done
+
 if [ ! -c "$SERIAL_PORT" ]; then
-    bashio::log.warning "Serial port $SERIAL_PORT not available"
-    bashio::log.warning "Waiting for device to be available..."
-    sleep 5
+    bashio::log.error "Serial port $SERIAL_PORT not found after ${TIMEOUT}s timeout"
+    bashio::log.error "Please verify your USB device is connected"
+    exit 1
 fi
 
-bashio::log.info "Serial port detected: $SERIAL_PORT"
 bashio::log.info "Starting Enocean daemon..."
 
 # Start the main application

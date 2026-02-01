@@ -1,12 +1,12 @@
-ARG BUILD_FROM=homeassistant/amd64-base:latest
+ARG BUILD_FROM=homeassistant/amd64-base:2024.01
 FROM ${BUILD_FROM}
 
 # Install system dependencies
 RUN apk add --no-cache \
       python3 \
       py3-pip \
-      py3-serial \
-      bash
+      bash \
+      git
 
 # Set working directory
 WORKDIR /app
